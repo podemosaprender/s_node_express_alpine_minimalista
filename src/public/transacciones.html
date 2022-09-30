@@ -1,0 +1,30 @@
+<script src="//unpkg.com/alpinejs" defer></script>
+ 
+<div x-data="{ transacciones: [] }">
+	<ul>
+		<template x-for="tx in transacciones">
+			<li>
+				Id: <span x-text="tx.id"></span>
+				De: <span x-text="tx.de"></span>
+				A: <span x-text="tx.a"></span>
+			</li>
+		</template>
+	</ul>
+	<p>Pagina 
+		<button @click="transacciones= await traerTransacciones(1)">1</button>
+		<button @click="transacciones= await traerTransacciones(2)">2</button>
+		<button @click="transacciones= await traerTransacciones(3)">3</button>
+		<button @click="transacciones= await traerTransacciones(4)">4</button>
+	</p>
+</div>
+
+
+<script>
+	async function traerTransacciones(pagina) {
+			r1= await fetch('/transacciones?pagina='+pagina);
+			r2= await r1.json();
+			console.log("transacciones",r2);
+			return r2;
+	}
+
+</script>
