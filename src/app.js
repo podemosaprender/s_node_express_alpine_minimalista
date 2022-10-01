@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 
+var db = require('./db'); //TODO: aislar en un modulo separado de  configuracion general de express
+
 var app = express();
 app.use(logger('dev'));
 //A: tengo una aplicacion
@@ -20,15 +22,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 //A: configure vistas, plantillas y public si quiero atender la vista, sino sacar
 
-app.use('', function(req, res, next) {
+app.use('', async function(req, res, next) {
 	console.log("REQ path", req.path);
-	const data= [];
-	for (var i=0; i<10; i++) {
-		var base= parseInt(req.query['pagina'])*10;
-		data.push(
-			{"id": 1001+base+i, "de": "Mauri", "a": "Mati", "cuanto": 1200+i, "cuando": "2022-09-24",  "por": "ayuda con billetera"}
-		);
-	}
+
+	const data= await db.transaccionesConUsuario(4, parseInt(req.query.pagina))
+
 	res.json(data); //TODO: implementar
 });
 
