@@ -1,6 +1,21 @@
 <script src="//unpkg.com/alpinejs" defer></script>
+<script src="lib.js" defer></script>
  
-<div x-data="{ transacciones: [] }">
+<div x-data="{ transacciones: [], usuario: 1 }">
+	<div>
+		Mi usuario es <input x-model="usuario" @keydown="transacciones= []">
+	</div>
+
+	<h2>Enviar</h2>
+	<ul x-data="{ a_id: 1, cuanto: 0, motivo: '', resultado: ''}">
+		<li>A (id): <input type="number" x-model="a_id"></li>
+		<li>Cuanto: <input type="number" x-model="cuanto"></li>
+		<li>Motivo: <input x-model="motivo"></li>
+		<li><button @click="r= await enviar(usuario, a_id, cuanto, motivo); resultado= JSON.stringify(r)">Enviar</button></li>
+		<li>Resultado: <span x-text="resultado"></span>
+	</ul>
+
+	<h2>Mis Transacciones</h2>
 	<ul>
 		<template x-for="tx in transacciones">
 			<li>
@@ -9,24 +24,33 @@
 				A: <span x-text="tx.AUsuario.nic"></span>
 				Cuanto: <span x-text="tx.cuanto"></span>
 				Cuando: <span x-text="tx.createdAt"></span>
+				Motivo: <span x-text="tx.motivo"></span>
 			</li>
 		</template>
 	</ul>
 	<p>Pagina 
-		<button @click="transacciones= await traerTransacciones(1)">1</button>
-		<button @click="transacciones= await traerTransacciones(2)">2</button>
-		<button @click="transacciones= await traerTransacciones(3)">3</button>
-		<button @click="transacciones= await traerTransacciones(4)">4</button>
+		<button @click="transacciones= await traerTransacciones(usuario,1)">1</button>
+		<button @click="transacciones= await traerTransacciones(usuario,2)">2</button>
+		<button @click="transacciones= await traerTransacciones(usuario,3)">3</button>
+		<button @click="transacciones= await traerTransacciones(usuario,4)">4</button>
 	</p>
+
 </div>
 
 
 <script>
-	async function traerTransacciones(pagina) {
-			r1= await fetch('/transacciones?pagina='+(pagina-1)); //A: backend cuenta 0 como primera pagina
+	async function traerTransacciones(usuario, pagina) {
+			console.log("usuario",usuario);
+			r1= await fetch('/transacciones?usuario='+usuario+'&pagina='+(pagina-1)); //A: backend cuenta 0 como primera pagina
 			r2= await r1.json();
 			console.log("transacciones",r2);
 			return r2;
+	}
+
+	async function enviar(de, a, cuanto, motivo) {
+			r1= await postData('/enviar', {de, a, cuanto, motivo});
+			console.log("enviar",r1);
+			return r1;
 	}
 
 </script>

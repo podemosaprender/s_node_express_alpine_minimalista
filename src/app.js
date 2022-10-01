@@ -23,10 +23,28 @@ app.set('view engine', 'ejs');
 //A: configure vistas, plantillas y public si quiero atender la vista, sino sacar
 
 app.use('', async function(req, res, next) {
-	console.log("REQ path", req.path);
+	console.log("REQ method, path", req.method, req.path);
 
-	const data= await db.transaccionesConUsuario(4, parseInt(req.query.pagina))
+	let data= {error: 'desconocido'};
 
+	if (req.method=='GET' && req.path=='/transacciones') { //TODO: permisos, validaciones
+		const pagina= parseInt(req.query.pagina)
+		const usuario= parseInt(req.query.usuario)
+		data= await db.transaccionesConUsuario(usuario, pagina)
+	}
+	else if (req.method=='POST' && req.path=='/enviar') {//TODO: permisos, validaciones
+		const de= parseInt(req.body.de);
+		const a= parseInt(req.body.a);
+		const cuanto= parseInt(req.body.cuanto);
+		const motivo= (req.body.motivo+'').substr(0,40);
+		const d= { DeUsuarioId: de, AUsuarioId: a, cuanto, motivo };
+		try {
+			data= await db.Transaccion.create(d);	
+		} catch(ex) {
+			console.error("ERR Enviar",d,ex);
+		}
+	}
+	console.log(JSON.stringify(data));
 	res.json(data); //TODO: implementar
 });
 
