@@ -27,6 +27,7 @@ Modelos.Transaccion = sequelize.define('Transaccion', {
 	}, {
 		tableName: 'transaccion',
 });
+//A: sqlize agrega automaticamente ceratedAt y updatedAt con fecha y hora, el resto son relaciones aca abajo
 
 Modelos.Usuario.hasMany( Modelos.Transaccion, { as: 'DeUsuario' } );
 Modelos.Transaccion.belongsTo( Modelos.Usuario , { as: 'DeUsuario' });
@@ -35,7 +36,8 @@ Modelos.Usuario.hasMany( Modelos.Transaccion, { as: 'AUsuario' } );
 Modelos.Transaccion.belongsTo( Modelos.Usuario , { as: 'AUsuario' });
 //A: conectamos Transaccion al usuario que COBRA
 //VER: https://sequelize.org/docs/v6/core-concepts/assocs/#options-1
-////VER: https://sequelize.org/docs/v6/core-concepts/assocs/#defining-an-alias
+//VER: https://sequelize.org/docs/v6/core-concepts/assocs/#defining-an-alias
+//TODO: por algun motivo nos esta agregando una columna UsuarioId que NO VA!
 
 //S: Datos de prueba  =================================================
 async function crearDatosDePrueba() {
@@ -70,7 +72,7 @@ async function crearVarios(modelo, datos) { //U: crea todos los elementos del ar
 }
 
 async function transaccionesConUsuario(unUsuarioId, pagina=0, paginaCuantos= 10) { //U: todas las tx donde cobra o paga unUsuarioId
-	//VER: https://meet.google.com/axc-osxo-roy
+	//VER: https://sequelize.org/api/v6/class/src/model.js~model#static-method-findAll
 	var array= await Modelos.Transaccion.findAll( { 
 		limit: paginaCuantos,
 		offset: (pagina * paginaCuantos),
@@ -92,6 +94,7 @@ async function transaccionesConUsuario(unUsuarioId, pagina=0, paginaCuantos= 10)
 }
 
 async function BorrarYRecrearDb( quiereDatosDePrueba ) { //U: BORRA y (re)crea db, tablas y datos de prueba
+	//TODO: hacer un script aparte para llamarla desde la consola
 	await sequelize.sync({ force: true });
 	console.log("Modelos creados");
 	if ( quiereDatosDePrueba ) {
